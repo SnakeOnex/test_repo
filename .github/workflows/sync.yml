@@ -35,9 +35,15 @@ jobs:
         git remote add public https://github.com/urob-ctu/classification.git
         git add .
         git commit -m "Initial commit without history"
-    
+
     - name: Force push to public repo
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GITHUB_TOKEN for authentication
       run: |
-        git push public main --force
-        #      env:
-        #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/urob-ctu/classification.git main --force
+    
+    # - name: Force push to public repo
+    #   run: |
+    #     git push public main --force
+    #     #      env:
+    #     #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
