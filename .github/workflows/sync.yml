@@ -34,6 +34,7 @@ jobs:
         git remote add public https://github.com/urob-ctu/classification.git
         git add .
         git commit -m "Initial commit without history"
+        git branch -M main  # Rename to 'main' branch
     
     - name: Force push to public repo
       run: |
