@@ -30,11 +30,11 @@ jobs:
     - name: Reset commit history
       run: |
         rm -rf .git
+        git config --global init.defaultBranch main
         git init
         git remote add public https://github.com/urob-ctu/classification.git
         git add .
         git commit -m "Initial commit without history"
-        git branch -M main  # Rename to 'main' branch
     
     - name: Force push to public repo
       run: |
