@@ -1,0 +1,20 @@
+# Files from this list are either removed (if right part after ==> is empty) or renamed in the student repo
+# Watch out for spaces at the ends of lines - they are interpreted as filenames!
+# When removing/renaming whole folders, use regex to match all files in them. Removing whole folders is not supported.
+#frontier_test_brute.zip==>
+#planning_test_brute.zip==>
+#aro_exploration/data/control/test_paths_evaluation.csv==>
+#aro_exploration/config/control_params_teacher.yaml==>
+#regex:^aro_exploration/data/slam/.*==>
+#aro_exploration/nodes/slam/eval_batch==>
+#aro_exploration/nodes/planning/tester.py==>
+#regex:^aro_exploration/src/aro_frontier/.*==>
+#regex:^aro_exploration/src/aro_planning/.*==>
+#aro_exploration/src/aro_slam/ae.py==>
+#aro_reactive_control/scripts/reference_solution_generator.py==>
+#aro_reactive_control/launch/ref_solution_generator.launch==>
+#aro_reactive_control/data/ref_solution_687.txt==>
+#aro_reactive_control/data/ref_solution_3.txt==>
+#aro_reactive_control/data/scan_data_687.bag==>
+#aro_reactive_control/data/scan_data_3.bag==>
+src/assignments_solution/*==>
