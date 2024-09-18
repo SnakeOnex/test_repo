@@ -18,7 +18,7 @@ jobs:
     
     - name: Set up Git
       run: |
-        git config --global user.name 'Aleš Kučera Bot'
+        git config --global user.name 'Aleš Kučera's Bot'
         git config --global user.email 'kuceral4@fel.cvut.cz'
     
     - name: Remove sensitive files and folders
@@ -27,13 +27,13 @@ jobs:
         git rm -r --cached src/assignments_solution
         git commit -m "Remove private files and folders before sync"
 
-    - name: Unshallow the repository
-      run: git fetch --unshallow
-
-    - name: Add public repo remote
+    - name: Reset commit history
       run: |
+        rm -rf .git
+        git init
         git remote add public https://github.com/urob-ctu/classification.git
-        git remote -v  # Debug: List remotes
+        git add .
+        git commit -m "Initial commit without history"
     
     - name: Force push to public repo
       run: |
