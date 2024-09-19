@@ -108,7 +108,7 @@ SLIMAK
         num_train = self.X_train.shape[0]
         dists = np.zeros((num_test, num_train))
 
-        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 1.2 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 1.3 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
         # TODO:                                                             #
         # Calculate the L2 distance between every test point and every      #
         # training point efficiently, without resorting to explicit loops.  #
@@ -139,7 +139,7 @@ SLIMAK
         y_pred = np.zeros(num_test)
         for i in range(num_test):
             y_pred[i] = 0
-            # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 1.3 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+            # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 1.2 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
             # TODO:                                                             #
             # Utilize the distance matrix to identify the k nearest neighbors   #
             # of the ith testing point. Then, retrieve the labels of these      #
