@@ -14,7 +14,6 @@ class LinearClassifier:
         num_classes: int,
         learning_rate: float = 1e-3,
         batch_size: int = 100,
-        weight_scale: float = 1e-3,
         reg: float = 1e-3,
         num_iters: int = 1000,
     ):
@@ -96,19 +95,6 @@ class LinearClassifier:
 
         return loss_history, acc_history
 
-    def predict(self, X: torch.Tensor) -> torch.Tensor:
-        """Predict the labels of the data.
-
-        Args:
-            X: Input data of shape (N, D)
-
-        Returns:
-            y_pred: The predicted labels of the data. Array of shape (N,)
-        """
-
-        logits = self.forward(X)
-        return torch.argmax(logits, axis=1)
-
     def forward(self, X: torch.Tensor) -> torch.Tensor:
         """Compute the logits of the model.
 
@@ -131,27 +117,68 @@ SLIMAK
 
         return logits
 
+    def predict(self, X: torch.Tensor) -> torch.Tensor:
+        """Predict the labels of the data.
+
+        Args:
+            X (torch.Tensor): Input data of shape (N, D)
+
+        Returns:
+            y_pred (torch.Tensor): The predicted labels of the data. Array of shape (N,)
+        """
+
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 3.2 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+        # TODO:                                                             #
+        # Implement the prediction function of the model.                   #
+        #                                                                   #
+        # Good luck!                                                        #
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+SLIMAK
+
+        return y_pred
+
     def loss(self, X: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Compute the loss of the model.
+
+        Args:
+            X (torch.Tensor): Input data of shape (N, D)
+            y (torch.Tensor): Labels of shape (N,)
+
+        Returns:
+            torch.Tensor: The loss of the model
+        """
+
         loss = torch.tensor([0.0], requires_grad=True)
 
-        loss_fn = torch.nn.CrossEntropyLoss()
-
-        logits = self.forward(X)
-        loss = loss_fn(logits, y)
-
-        for name in self.params.keys():
-            loss = loss + self.reg * torch.sum(self.params[name] ** 2)
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 3.2 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+        # TODO:                                                             #
+        # Implement the loss function of the model. The loss function       #
+        # should be the cross-entropy loss with L2 regularization.          #
+        #                                                                   #
+        # HINT: You may find torch.nn.CrossEntropyLoss() useful.            #
+        #                                                                   #
+        # Good luck!                                                        #
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+SLIMAK
 
         return loss
 
+    def _update_weights(self):
+        """Update the weights of the model using the gradient descent."""
+
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 3.4 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+        # TODO:                                                             #
+        # Implement the loss function of the model. The loss function       #
+        # should be the cross-entropy loss with L2 regularization.          #
+        #                                                                   #
+        # HINT: You may find torch.nn.CrossEntropyLoss() useful.            #
+        #                                                                   #
+        # Good luck!                                                        #
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+SLIMAK
+
     def _zero_gradients(self):
+        """Zero the gradients of the model parameters."""
         for name in self.params.keys():
             if self.params[name].grad is not None:
                 self.params[name].grad.zero_()
-
-    def _update_weights(self):
-        with torch.no_grad():
-            for name in self.params.keys():
-                self.params[name].data = (
-                    self.params[name].data - self.learning_rate * self.params[name].grad
-                )

@@ -6,8 +6,13 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from assignments.knn_classifier import KNNClassifier
 
 
-def cross_validate_knn(classifier: KNNClassifier, X: np.ndarray, y: np.ndarray,
-                       k_choices: np.ndarray, num_folds: int) -> Dict[str, Dict[int, np.ndarray]]:
+def cross_validate_knn(
+    classifier: KNNClassifier,
+    X: np.ndarray,
+    y: np.ndarray,
+    k_choices: np.ndarray,
+    num_folds: int,
+) -> Dict[str, Dict[int, np.ndarray]]:
     """Performs cross-validation for kNN classifier. This is done by following the steps below:
         1. Randomly shuffle the data and labels.
         2. Split the data into k_folds.
@@ -76,7 +81,7 @@ def cross_validate_knn(classifier: KNNClassifier, X: np.ndarray, y: np.ndarray,
     k_to_metrics["recall"] = dict()
     k_to_metrics["f1"] = dict()
 
-    # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 2.2 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+    # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 2.1 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
     # TODO:                                                             #
     # Implement cross-validation for kNN classifier. Use ChatGPT to     #
     # understand the k-fold cross-validation procedure. You may use     #

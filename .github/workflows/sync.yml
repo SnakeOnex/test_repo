@@ -21,11 +21,16 @@ jobs:
         git config --global user.name 'Aleš Kučera Bot'
         git config --global user.email 'kuceral4@fel.cvut.cz'
     
-    - name: Remove sensitive files and folders
+    - name: Replace private code with placeholders
       run: |
-        git rm -r --cached .github
-        git rm -r --cached src/assignments_solution
-        git commit -m "Remove private files and folders before sync"
+        python .github/scripts/replace_code.py src/assignments_solution/knn_classifier.py
+        python .github/scripts/replace_code.py src/assignments_solution/linear_classifier.py
+        python .github/scripts/replace_code.py src/assignments_solution/mlp_classifier.py
+        python .github/scripts/replace_code.py src/assignments_solution/tuning.py
+
+    - name: Remove private files and directories
+      run:
+        rm -rf .github
 
     - name: Reset commit history
       run: |
@@ -41,15 +46,3 @@ jobs:
         PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}  # Use PAT for authentication
       run: |
         git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/urob-ctu/classification.git main --force
-
-    # - name: Force push to public repo
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GITHUB_TOKEN for authentication
-    #   run: |
-    #     git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/urob-ctu/classification.git main --force
-    
-    # - name: Force push to public repo
-    #   run: |
-    #     git push public main --force
-    #     #      env:
-    #     #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
