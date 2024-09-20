@@ -22,7 +22,7 @@ class KNNClassifier:
     """
 
     def __init__(self, k: int = 1, vectorized: bool = False):
-        assert k > 0, 'k must be greater than 0!'
+        assert k > 0, "k must be greater than 0!"
 
         self.k = k
         self.vectorized = vectorized
@@ -57,8 +57,12 @@ class KNNClassifier:
             of features in the training data and input data do not match.
         """
 
-        assert self.X_train is not None and self.y_train is not None, 'Train the classifier first!'
-        assert self.X_train.shape[1] == X.shape[1], 'Train and test data must have the same number of features!'
+        assert (
+            self.X_train is not None and self.y_train is not None
+        ), "Train the classifier first!"
+        assert (
+            self.X_train.shape[1] == X.shape[1]
+        ), "Train and test data must have the same number of features!"
 
         if self.vectorized:
             dists = self._compute_distances_vectorized(X)
@@ -83,7 +87,6 @@ class KNNClassifier:
 
         for i in range(num_test):
             for j in range(num_train):
-                dists[i, j] = 0
                 # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 1.1 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
                 # TODO:                                                             #
                 # Calculate the L2 distance between the ith test point and the jth  #

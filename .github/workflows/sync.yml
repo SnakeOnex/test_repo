@@ -18,15 +18,15 @@ jobs:
     
     - name: Set up Git
       run: |
-        git config --global user.name 'Aleš Kučera Bot'
-        git config --global user.email 'kuceral4@fel.cvut.cz'
+        git config --global user.name 'UROB Bot'
+        git config --global user.email 'bob@robot.cz'
     
     - name: Replace private code with placeholders
       run: |
-        python .github/scripts/replace_code.py src/assignments_solution/knn_classifier.py
-        python .github/scripts/replace_code.py src/assignments_solution/linear_classifier.py
-        python .github/scripts/replace_code.py src/assignments_solution/mlp_classifier.py
-        python .github/scripts/replace_code.py src/assignments_solution/tuning.py
+        python .github/scripts/replace_code.py src/assignments/knn_classifier.py
+        python .github/scripts/replace_code.py src/assignments/linear_classifier.py
+        python .github/scripts/replace_code.py src/assignments/mlp_classifier.py
+        python .github/scripts/replace_code.py src/assignments/tuning.py
 
     - name: Remove private files and directories
       run:

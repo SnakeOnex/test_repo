@@ -1,111 +1,184 @@
+from copy import deepcopy
+
+import torch
 import numpy as np
-from utils.engine import Tensor
+import torch.nn as nn
+from tqdm import tqdm
+from sklearn.metrics import accuracy_score
 
 
 class LinearClassifier:
-    def __init__(self, num_features: int, num_classes: int, learning_rate: float = 1e-3,
-                 weight_scale: float = 1e-4, batch_size: int = 100,
-                 num_iters: int = 1000, verbose: bool = True, reg: float = 1e-3):
+    def __init__(
+        self,
+        num_features: int,
+        num_classes: int,
+        learning_rate: float = 1e-3,
+        batch_size: int = 100,
+        reg: float = 1e-3,
+        num_iters: int = 1000,
+    ):
 
         self.num_classes = num_classes
         self.num_features = num_features
 
-        self.verbose = verbose
+        self.reg = reg
         self.num_iters = num_iters
         self.batch_size = batch_size
-        self.weight_scale = weight_scale
         self.learning_rate = learning_rate
-        self.reg = reg
 
-        self.W = Tensor(np.random.randn(num_features, num_classes) * weight_scale, req_grad=True)
-        self.b = Tensor(np.zeros(num_classes), req_grad=True)
+        self.params = dict(
+            W=nn.Parameter(
+                torch.randn(num_features, num_classes, dtype=torch.float)
+                * np.sqrt(2 / (num_features + num_classes))
+            ),
+            b=nn.Parameter(torch.zeros(num_classes, dtype=torch.float)),
+        )
 
-    def load_weights(self, W: np.ndarray, b: np.ndarray) -> None:
-        """ Load the weights and biases into the model.
+    def train(
+        self,
+        X_train: torch.Tensor,
+        y_train: torch.Tensor,
+        X_val: torch.Tensor,
+        y_val: torch.Tensor,
+    ) -> tuple:
 
-        Args:
-            W: The weights of shape (D, C)
-            b: The biases of shape (C,)
+        # Initialize the best validation accuracy and the best parameters
+        best_val_acc = 0
+        best_params = dict()
 
-        Returns:
-            None
-        """
+        # Initialize the loss and accuracy history
+        loss_history = dict(train=dict(), val=dict())
+        acc_history = dict(train=dict(), val=dict())
 
-        self.W = Tensor(W, req_grad=True)
-        self.b = Tensor(b, req_grad=True)
+        # Training loop
+        for i in tqdm(range(self.num_iters), desc="Training"):
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        """ Predict the labels of the data.
+            # Select a random batch of data
+            batch_indices = torch.randint(0, X_train.shape[0], (self.batch_size,))
+            X_batch = X_train[batch_indices]
+            y_batch = y_train[batch_indices]
+
+            # Zero the gradients
+            self._zero_gradients()
+
+            # Compute the loss and backpropagate
+            train_loss = self.loss(X_batch, y_batch)
+            train_loss.backward(retain_graph=True)
+            self._update_weights()
+
+            # Save the training loss
+            loss_history["train"][i] = train_loss.data
+
+            # Every 500 iterations, compute the validation loss and accuracy
+            if i % 100 == 0 or i == self.num_iters - 1:
+
+                # Compute the validation loss
+                with torch.no_grad():
+                    val_loss = self.loss(X_val, y_val)
+                loss_history["val"][i] = val_loss.data
+
+                # Predict the labels for the training and validation data
+                y_pred_train = self.predict(X_train)
+                y_pred_val = self.predict(X_val)
+
+                # Compute the training and validation accuracy from the predicted labels
+                acc_history["train"][i] = accuracy_score(y_train, y_pred_train)
+                acc_history["val"][i] = accuracy_score(y_val, y_pred_val)
+
+                # If the current validation accuracy is the best so far, save the parameters
+                if acc_history["val"][i] > best_val_acc:
+                    best_val_acc = acc_history["val"][i]
+                    best_params = deepcopy(self.params)
+
+        # Update the parameters with the best ones
+        self.params = best_params
+
+        return loss_history, acc_history
+
+    def forward(self, X: torch.Tensor) -> torch.Tensor:
+        """Compute the logits of the model.
 
         Args:
             X: Input data of shape (N, D)
 
         Returns:
-            y_pred: The predicted labels of the data. Array of shape (N,)
-        """
-
-        scores = self.compute_scores(X)
-        return np.argmax(scores.data, axis=1)
-
-    def train(self, X: np.ndarray, y: np.ndarray) -> list:
-        num_train = X.shape[0]
-
-        loss_history = []
-        for i in range(self.num_iters):
-            batch_indices = np.random.choice(num_train, self.batch_size, replace=False)
-            X_batch = X[batch_indices]
-            y_batch = y[batch_indices]
-
-            scores = self.compute_scores(X_batch)
-            loss = Tensor(0)
-
-            # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 3.2 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
-            # TODO:                                                             #
-            # Implement one iteration of the training loop. Use the computed    #
-            # scores to compute the Cross Entropy Loss, add the regularization  #
-            # loss of all parameters and store it to the variable `loss`.       #
-            # Then, compute the backward pass and update the weights and biases #
-            # of the model. After that zero out the gradients of the weights    #
-            # and biases.                                                       #
-            #                                                                   #
-            # HINT: - Use only already implemented functions of the Tensor      #
-            #         class.                                                    #
-            #       - Do not forget to add the regularization loss              #
-            #         (defined in Tensor class) of ALL parameters. Use self.reg #
-            #         as the regularization strength.                           #
-            #       - Call step() on the `loss` variable to update              #
-            #         the parameters.                                           #
-            #                                                                   #
-            # Good luck!                                                        #
-            # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
-SLIMAK
-
-            loss_history.append(loss.data)
-            if self.verbose and i % 100 == 0:
-                print(f"iteration {i} / {self.num_iters}: {loss.data}")
-
-        return loss_history
-
-    def compute_scores(self, X: np.ndarray) -> Tensor:
-        """ Compute the scores of the model.
-
-        Args:
-            X: Input data of shape (N, D)
-
-        Returns:
-            scores: The scores of the model. Tensor of shape (N, C)
+            logits: The logits of the model. Tensor of shape (N, C)
 
         """
-
-        scores = Tensor(np.zeros((X.shape[0], self.num_classes)), req_grad=False)
-        X = Tensor(X)
+        logits = torch.zeros((X.shape[0], self.num_classes))
 
         # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 3.1 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
         # TODO:                                                             #
-        # Implement computation of the scores of the model.                 #
+        # Implement computation of the logits of the model.                 #
         #                                                                   #
         # Good luck!                                                        #
         # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
 SLIMAK
 
-        return scores
+        return logits
+
+    def predict(self, X: torch.Tensor) -> torch.Tensor:
+        """Predict the labels of the data.
+
+        Args:
+            X (torch.Tensor): Input data of shape (N, D)
+
+        Returns:
+            y_pred (torch.Tensor): The predicted labels of the data. Array of shape (N,)
+        """
+
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 3.2 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+        # TODO:                                                             #
+        # Implement the prediction function of the model.                   #
+        #                                                                   #
+        # Good luck!                                                        #
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+SLIMAK
+
+        return y_pred
+
+    def loss(self, X: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """Compute the loss of the model.
+
+        Args:
+            X (torch.Tensor): Input data of shape (N, D)
+            y (torch.Tensor): Labels of shape (N,)
+
+        Returns:
+            torch.Tensor: The loss of the model
+        """
+
+        loss = torch.tensor([0.0], requires_grad=True)
+
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 3.2 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+        # TODO:                                                             #
+        # Implement the loss function of the model. The loss function       #
+        # should be the cross-entropy loss with L2 regularization.          #
+        #                                                                   #
+        # HINT: You may find torch.nn.CrossEntropyLoss() useful.            #
+        #                                                                   #
+        # Good luck!                                                        #
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+SLIMAK
+
+        return loss
+
+    def _update_weights(self):
+        """Update the weights of the model using the gradient descent."""
+
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱ Assignment 3.4 ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+        # TODO:                                                             #
+        # Implement the loss function of the model. The loss function       #
+        # should be the cross-entropy loss with L2 regularization.          #
+        #                                                                   #
+        # HINT: You may find torch.nn.CrossEntropyLoss() useful.            #
+        #                                                                   #
+        # Good luck!                                                        #
+        # ▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰▱▰ #
+SLIMAK
+
+    def _zero_gradients(self):
+        """Zero the gradients of the model parameters."""
+        for name in self.params.keys():
+            if self.params[name].grad is not None:
+                self.params[name].grad.zero_()
