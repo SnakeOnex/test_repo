@@ -18,8 +18,8 @@ jobs:
     
     - name: Set up Git
       run: |
-        git config --global user.name 'UROB Bot'
-        git config --global user.email 'bob@robot.cz'
+        git config --global user.name 'Aleš Kučera'
+        git config --global user.email 'kuceral4@fel.cvut.cz'
     
     - name: Replace private code with placeholders
       run: |
