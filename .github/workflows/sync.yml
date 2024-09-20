@@ -39,7 +39,7 @@ jobs:
         git init
         git remote add public https://github.com/urob-ctu/classification.git
         git add .
-        git commit -m "Initial commit without history"
+        git commit -m "Commit without history"
 
     - name: Force push to public repo using PAT
       env:
