@@ -21,26 +21,39 @@ jobs:
         git config --global user.name 'Aleš Kučera'
         git config --global user.email 'kuceral4@fel.cvut.cz'
     
-    - name: Replace private code with placeholders
-      run: |
-        python .github/scripts/replace_code.py src/assignments/knn_classifier.py
-        python .github/scripts/replace_code.py src/assignments/linear_classifier.py
-        python .github/scripts/replace_code.py src/assignments/mlp_classifier.py
-        python .github/scripts/replace_code.py src/assignments/tuning.py
+#    - name: Replace private code with placeholders
+#      run: |
+#        python .github/scripts/replace_code.py src/assignments/knn_classifier.py
+#        python .github/scripts/replace_code.py src/assignments/linear_classifier.py
+#        python .github/scripts/replace_code.py src/assignments/mlp_classifier.py
+#        python .github/scripts/replace_code.py src/assignments/tuning.py
 
-    - name: Remove private files and directories
-      run:
-        rm -rf .github
-        rm -rf data/brute_tests
-
-    - name: Reset commit history
+#    - name: Remove private files and directories
+#      run:
+#        rm -rf .github
+#        rm -rf data/brute_tests
+#
+#    - name: Reset commit history
+#      run: |
+#        rm -rf .git
+#        git config --global init.defaultBranch main
+#        git init
+#        git remote add public https://github.com/urob-ctu/classification.git
+#        git add .
+#        git commit -m "Commit without history"
+        
+    - name: Filter sensitive data
       run: |
-        rm -rf .git
-        git config --global init.defaultBranch main
-        git init
+        .github/scripts/git-filter-repo \
+        --source . \
+        --target . \
+        --replace-text ".github/scripts/replace_code" \
+        --paths-from-file ".github/scripts/remove_files" \
+        --invert-paths
+
+    - name: Add public repo as remote
+      run: |
         git remote add public https://github.com/urob-ctu/classification.git
-        git add .
-        git commit -m "Commit without history"
 
     - name: Force push to public repo using PAT
       env:
