@@ -47,9 +47,9 @@ jobs:
 
     - name: Filter sensitive data
       run: |
-        .github/scripts/git-filter-repo \
-        --source . \
-        --target . \
+        ".github/scripts/git-filter-repo" \
+        --source $(pwd) \
+        --target $(pwd) \
         --replace-text ".github/scripts/replace_code" \
         --paths-from-file ".github/scripts/remove_files" \
         --invert-paths \
