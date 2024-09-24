@@ -41,7 +41,10 @@ jobs:
 #        git remote add public https://github.com/urob-ctu/classification.git
 #        git add .
 #        git commit -m "Commit without history"
-        
+    - name: Check the working directory
+      run: |
+          ls -la
+
     - name: Filter sensitive data
       run: |
         .github/scripts/git-filter-repo \
@@ -51,6 +54,10 @@ jobs:
         --paths-from-file ".github/scripts/remove_files" \
         --invert-paths \
         --debug
+
+    - name: Check the working directory
+      run: |
+        ls -la
 
     - name: Add public repo as remote
       run: |
