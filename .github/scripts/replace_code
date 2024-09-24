@@ -1,1 +1,1 @@
-regex:(?m)^.*()[\S\s]*?(TERMINATION).*$==>
+regex:(?m)^.*(REMOVE START)[\S\s]*?(REMOVE END).*$==>
