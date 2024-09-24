@@ -1,5 +1,5 @@
 # Files from this list are either removed (if right part after ==> is empty) or renamed in the student repo
 # Watch out for spaces at the ends of lines - they are interpreted as filenames!
 # When removing/renaming whole folders, use regex to match all files in them. Removing whole folders is not supported.
-.github/==>
-data/brute_tests/==>
+.github/*==>
+data/brute_tests/*==>
