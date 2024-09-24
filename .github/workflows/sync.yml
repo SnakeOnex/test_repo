@@ -49,7 +49,8 @@ jobs:
         --target . \
         --replace-text ".github/scripts/replace_code" \
         --paths-from-file ".github/scripts/remove_files" \
-        --invert-paths
+        --invert-paths \
+        --debug
 
     - name: Add public repo as remote
       run: |

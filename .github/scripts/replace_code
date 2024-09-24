@@ -1,1 +1,1 @@
-SLIMAK
+regex:(?m)^.*()[\S\s]*?(TERMINATION).*$==>
